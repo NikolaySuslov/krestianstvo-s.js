@@ -1,0 +1,26 @@
+{
+  "name": "krestianstvo-s.js",
+  "version": "0.1.0",
+  "description": "Krestianstvo | S.js",
+  "main": "index.js",
+  "scripts": {
+    "build": "vite build",
+    "start": "vite",
+    "dev": "vite",
+    "serve": "vite preview"
+  },
+  "license": "MIT",
+  "author": "Nikolay Suslov",
+  "devDependencies": {
+    "vite": "^3.0.9"
+  },
+  "dependencies": {
+    "alea": "^1.0.1",
+    "million": "^1.12.6-beta.0",
+    "qheap": "^1.4.0",
+    "s-array": "^0.4.10",
+    "s-js": "^0.4.9",
+    "socket.io-client": "^4.5.1",
+    "uuid": "^8.3.2"
+  }
+}

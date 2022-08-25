@@ -1,0 +1,12 @@
+# Node.js
+.vscode
+
+node_modules
+certs
+
+npm-debug.log
+config.json
+error.log
+combined.log
+
+dist
