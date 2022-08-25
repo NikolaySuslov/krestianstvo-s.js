@@ -11,14 +11,16 @@ This prototype is the part of the biggest **[Krestianstvo | Solid JS](https://gi
 Public running reflector: **https://time.krestianstvo.org**
 
 Run your local:    
-git clone **https://github.com/NikolaySuslov/lcs-reflector**
-npm install
+git clone **https://github.com/NikolaySuslov/lcs-reflector**  
+
+npm install  
 npm run start
 
 2. Run Krestianstvo | S.js
 
-git clone **https://github.com/NikolaySuslov/krestianstvo-sjs**
-npm install
+git clone **https://github.com/NikolaySuslov/krestianstvo-s.js**  
+
+npm install  
 npm run start
 
 ## Build and deploy
