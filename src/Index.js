@@ -5,14 +5,20 @@ Copyright (c) 2022 Nikolay Suslov and the Krestianstvo.org project contributors.
 */
 
 import App from './App.js';
-import { createElement, m } from 'million';
+import { render, m, style} from 'million';
 
-document.body.appendChild(
-    createElement(
-        m('div', {}, [m('h2', {}, ["Krestianstvo | S.js"])])
-        )
-    )
+let vNode = m('div', {}, [
+    m('h2', {}, ["Krestianstvo | S.js"]),
+    m('div', { style: style({
+        display: "grid",
+        "grid-template-columns": "50% 50%",
+        "grid-auto-rows": "1fr",
+        gap: "0px 6px"
+    }) }, [
+        new App("app1").initView(),
+        new App("app1").initView(),
+        new App("app2").initView()
+    ])
+])
 
-new App("app1")
-new App("app1")  
-new App("app2") 
+render(document.body, vNode);

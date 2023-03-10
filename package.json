@@ -12,15 +12,15 @@
   "license": "MIT",
   "author": "Nikolay Suslov",
   "devDependencies": {
-    "vite": "^3.0.9"
+    "vite": "^4.1.4"
   },
   "dependencies": {
     "alea": "^1.0.1",
-    "million": "^1.12.6-beta.0",
+    "million": "^1.12.6-beta.2",
     "qheap": "^1.4.0",
     "s-array": "^0.4.10",
     "s-js": "^0.4.9",
-    "socket.io-client": "^4.5.1",
-    "uuid": "^8.3.2"
+    "socket.io-client": "^4.6.1",
+    "uuid": "^9.0.0"
   }
 }

@@ -6,7 +6,7 @@ Copyright (c) 2022 Nikolay Suslov and the Krestianstvo.org project contributors.
 
 import { default as S } from 's-js/dist/es/withsubclocks';
 import { default as SArray } from './lib/s-array/es/index.js';
-import { m, patch, createElement } from 'million';
+import { m, patch} from 'million';
 import { initSelo } from './Krestianstvo.js';
 
 
@@ -53,7 +53,7 @@ class App {
         //Initialize Selo and App
 
         this.selo = initSelo(id, this)
-        this.initView();
+        //this.initView();
         self.startApp()
 
     }
@@ -85,8 +85,20 @@ class App {
                         }
 
                         S(() => {
-                            if (self.appState[el + "_mouse"]())
-                                self.drawAvatar()
+                            if (self.appState[el + "_mouse"]()) {
+                                if (!self.canvas) {
+                                    let elID = self.appDivID + '_canvas'
+                                    let el = document.getElementById(elID)
+                                    self.canvas = el;
+                                    self.context = el.getContext("2d");
+                                    window.addEventListener('mousemove', self.drawOnCanvas.bind(self), false);
+                                } else {
+                                    self.drawAvatar()
+                                }
+
+
+                            }
+
                         })
 
                     })
@@ -104,8 +116,12 @@ class App {
 
             S.on(self.msgs.tick, () => {
                 let tick = self.msgs.tick();
-                const v = m('div', {}, [m('h3', {}, ["Tick: ", tick.toPrecision(4)])]);
-                patch(self.el, v);
+                let elID = self.appDivID + '_tick'
+                let el = document.getElementById(elID)
+                const v = m('div', { id: elID }, [m('h3', {}, ["Tick: ", tick.toPrecision(4)])]);
+                if (el)
+                    patch(el, v);
+
             }, null, true)
 
             S.on(self.msgs.mousePosition, () => {
@@ -140,37 +156,30 @@ class App {
             // reactive view
 
             S(() => {
-                document.body.style.backgroundColor = self.appState.bgColor();
+                let elID = self.appDivID
+                let el = document.getElementById(elID)
+                let color = self.appState.bgColor()
+                if (el)
+                    el.style.backgroundColor = color
             })
 
             S(() => {
                 console.log(S.sample(self.appState.counter))
-                const v2 = m('div', {}, [m('h1', {}, [self.appState.counter().toString()])]);
-                patch(self.el2, v2);
+                let elID = self.appDivID + '_el2'
+                let el = document.getElementById(elID)
+                const v2 = m('div', { id: elID }, [m('h1', {}, [self.appState.counter().toString()])]);
+                if (el)
+                    patch(el, v2);
             })
 
             S(() => {
                 //console.log(S.sample(self.appState.play))
-                const v2 = m('div', {}, [m('h2', {}, [self.appState.play().toString()])]);
-                patch(self.playEl, v2);
+                let elID = self.appDivID + '_playEl'
+                let el = document.getElementById(elID)
+                const v2 = m('div', { id: elID }, [m('h2', {}, [self.appState.play().toString()])]);
+                if (el)
+                    patch(el, v2);
             })
-
-            S(() => {
-                document.body.style.backgroundColor = self.appState.bgColor();
-            })
-
-            S(() => {
-                console.log(S.sample(self.appState.counter))
-                const v2 = m('div', {}, [m('h1', {}, [self.appState.counter().toString()])]);
-                patch(self.el2, v2);
-            })
-
-            S(() => {
-                //console.log(S.sample(self.appState.play))
-                const v2 = m('div', {}, [m('h2', {}, [self.appState.play().toString()])]);
-                patch(self.playEl, v2);
-            })
-
 
             self.running(true);
             // runner
@@ -233,60 +242,42 @@ class App {
     initView() {
         let self = this;
 
-        document.body.appendChild(createElement(m('p', {}, [m('a', { href: window.location.href, target: "_blank" }, [m('span', {}, ["Link to this World"])])])));
+        self.appDivID = self.randId()
+        let containerDiv = m('div', { id: self.appDivID }, [
+            m('p', {}, [m('a', { href: window.location.href, target: "_blank" }, [
+                m('span', {}, ["Link to this World"])
+            ])]),
+            m('div', { id: self.appDivID + '_tick' }),
+            m('button', {
+                onclick: () => {
+                    self.selo.sendExtMsg("inc", true)
+                }
+            }, [m('span', {}, "+")]),
+            m('button', {
+                onclick: () => {
+                    self.selo.sendExtMsg("dec", true);
+                }
+            }, [m('span', {}, "-")]),
+            m('div', { id: self.appDivID + '_el2' }, [m('h1', {}, [self.appState.counter().toString()])]),
+            m('div', { id: self.appDivID + '_el3' }),
+            m('div', { id: self.appDivID + '_playEl' }),
+            m('canvas',
+                {
+                    id: self.appDivID + '_canvas',
+                    width: 300,
+                    height: 300,
+                    style: "border:1px solid #000000;margin:0;padding:0;width:300px;height:300px"
+                }
+            ),
+            m('div', {}, [m('button', {
+                onclick: () => {
+                    self.selo.sendExtMsg("bgColor", true);
+                }
+            }, [m('span', {}, "Random color")])])
 
-        this.el = createElement(m('div'));
-        document.body.appendChild(this.el);
+        ])
 
-        let button = m('button', {
-            onclick: () => {
-                self.selo.sendExtMsg("inc", true)
-            }
-        }, [m('span', {}, "+")]);
-        const butt = createElement(button);
-        document.body.appendChild(butt);
-
-        const button2 = m('button', {
-            onclick: () => {
-                self.selo.sendExtMsg("dec", true);
-            }
-        }, [m('span', {}, "-")]);
-
-        const butt2 = createElement(button2);
-        document.body.appendChild(butt2);
-
-        this.el2 = createElement(m('div'));
-        document.body.appendChild(this.el2);
-
-        this.el3 = createElement(m('div'));
-        document.body.appendChild(this.el3);
-
-        this.playEl = createElement(m('div'));
-        document.body.appendChild(this.playEl);
-
-
-        const vcanvas = m('canvas', {
-            width: 300,
-            height: 300,
-            style: "border:1px solid #000000;margin:0;padding:0;width:300px;height:300px"
-        });
-        this.elCanvas = createElement(vcanvas);
-        document.body.appendChild(this.elCanvas);
-
-        this.canvas = this.elCanvas
-        this.context = this.canvas.getContext("2d");
-        window.addEventListener('mousemove', this.drawOnCanvas.bind(this), false);
-
-        let buttonColor = m('div', {}, [m('button', {
-            onclick: () => {
-                self.selo.sendExtMsg("bgColor", true);
-            }
-        }, [m('div', {}, "Random color")])]);
-        const brc = createElement(buttonColor);
-        document.body.appendChild(brc);
-
-        this.refEl = createElement(m('div', {}, []))
-        document.body.appendChild(this.refEl);
+        return containerDiv
 
     }
 
