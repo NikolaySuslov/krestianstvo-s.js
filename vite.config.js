@@ -1,9 +1,12 @@
 import { defineConfig } from 'vite';
-import { million } from 'million/vite-plugin-million';
 
 export default defineConfig(async (mode) => (
   {
-  plugins: [million()],
+  plugins: [],
+  esbuild: {
+    jsxFactory: 'h',
+    jsxInject: `import { h } from 'million/jsx-runtime';`
+  },
   build: {
       target: 'esnext',
       polyfillDynamicImport: false

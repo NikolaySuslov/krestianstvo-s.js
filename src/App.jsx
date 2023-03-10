@@ -1,12 +1,12 @@
 /*
 The MIT License (MIT)
-Copyright (c) 2022 Nikolay Suslov and the Krestianstvo.org project contributors.
+Copyright (c) 2023 Nikolay Suslov and the Krestianstvo.org project contributors.
 (https://github.com/NikolaySuslov/krestianstvo/blob/master/LICENSE.md)
 */
 
 import { default as S } from 's-js/dist/es/withsubclocks';
 import { default as SArray } from './lib/s-array/es/index.js';
-import { m, patch} from 'million';
+import { block, patch } from 'million';
 import { initSelo } from './Krestianstvo.js';
 
 
@@ -95,14 +95,9 @@ class App {
                                 } else {
                                     self.drawAvatar()
                                 }
-
-
                             }
-
                         })
-
                     })
-
                 }
             })
 
@@ -116,12 +111,8 @@ class App {
 
             S.on(self.msgs.tick, () => {
                 let tick = self.msgs.tick();
-                let elID = self.appDivID + '_tick'
-                let el = document.getElementById(elID)
-                const v = m('div', { id: elID }, [m('h3', {}, ["Tick: ", tick.toPrecision(4)])]);
-                if (el)
-                    patch(el, v);
-
+                if(self.tickNode)
+                    patch(self.tickNode, self.tickBlock({ tick: tick.toPrecision(4) }))
             }, null, true)
 
             S.on(self.msgs.mousePosition, () => {
@@ -164,21 +155,15 @@ class App {
             })
 
             S(() => {
-                console.log(S.sample(self.appState.counter))
-                let elID = self.appDivID + '_el2'
-                let el = document.getElementById(elID)
-                const v2 = m('div', { id: elID }, [m('h1', {}, [self.appState.counter().toString()])]);
-                if (el)
-                    patch(el, v2);
+                let count = self.appState.counter()
+                if (self.counterNode)
+                    patch(self.counterNode, self.counterBlock({ count: count }))
             })
 
             S(() => {
-                //console.log(S.sample(self.appState.play))
-                let elID = self.appDivID + '_playEl'
-                let el = document.getElementById(elID)
-                const v2 = m('div', { id: elID }, [m('h2', {}, [self.appState.play().toString()])]);
-                if (el)
-                    patch(el, v2);
+                let anim = self.appState.play()
+                if (self.animNode)
+                    patch(self.animNode, self.animBlock({ anim: anim }))
             })
 
             self.running(true);
@@ -240,44 +225,61 @@ class App {
     }
 
     initView() {
+
         let self = this;
 
         self.appDivID = self.randId()
-        let containerDiv = m('div', { id: self.appDivID }, [
-            m('p', {}, [m('a', { href: window.location.href, target: "_blank" }, [
-                m('span', {}, ["Link to this World"])
-            ])]),
-            m('div', { id: self.appDivID + '_tick' }),
-            m('button', {
-                onclick: () => {
-                    self.selo.sendExtMsg("inc", true)
-                }
-            }, [m('span', {}, "+")]),
-            m('button', {
-                onclick: () => {
-                    self.selo.sendExtMsg("dec", true);
-                }
-            }, [m('span', {}, "-")]),
-            m('div', { id: self.appDivID + '_el2' }, [m('h1', {}, [self.appState.counter().toString()])]),
-            m('div', { id: self.appDivID + '_el3' }),
-            m('div', { id: self.appDivID + '_playEl' }),
-            m('canvas',
-                {
-                    id: self.appDivID + '_canvas',
-                    width: 300,
-                    height: 300,
-                    style: "border:1px solid #000000;margin:0;padding:0;width:300px;height:300px"
-                }
-            ),
-            m('div', {}, [m('button', {
-                onclick: () => {
-                    self.selo.sendExtMsg("bgColor", true);
-                }
-            }, [m('span', {}, "Random color")])])
 
-        ])
+        self.tickBlock = block((props) => {
+            return (
+                <div>
+                    <h3>Tick: {props.tick}</h3>
+                </div>
+            )
+        })
+        self.tickNode = self.tickBlock({ tick: 0 })
 
-        return containerDiv
+        self.counterBlock = block((props) => {
+            return (
+                <div>
+                    <h1>{props.count}</h1>
+                </div>
+            )
+        })
+        self.counterNode = self.counterBlock({ count: 0 })
+
+        self.animBlock = block((props) => {
+            return (
+                <div>
+                    <h2>{props.anim}</h2>
+                </div>
+            )
+        })
+        self.animNode = self.animBlock({ anim: 0 })
+
+        self.viewApp = block((props) => {
+            return (
+                <div id={self.appDivID}>
+                    <p><a href={window.location.href} target="_blank">Link to this World</a></p>
+                    {self.tickNode}
+                    <button onclick={() => self.selo.sendExtMsg("inc", true)}>+</button>
+                    <button onclick={() => self.selo.sendExtMsg("dec", true)}>-</button>
+                    {self.counterNode}
+                    {self.animNode}
+                    <button onclick={() => self.selo.sendExtMsg("bgColor", true)}>Random color
+                    </button> <br />
+                    <canvas id={self.appDivID + '_canvas'}
+                        width="300" height="300" style={{
+                            border: "1px solid #000000",
+                            margin: 0,
+                            padding: 0
+                        }}></canvas>
+
+                </div>
+            )
+        })
+
+        return self.viewApp()
 
     }
 

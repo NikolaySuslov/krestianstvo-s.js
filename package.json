@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "alea": "^1.0.1",
-    "million": "^1.12.6-beta.2",
+    "million": "^2.0.0",
     "qheap": "^1.4.0",
     "s-array": "^0.4.10",
     "s-js": "^0.4.9",
